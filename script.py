@@ -12,14 +12,14 @@ st.title("💪 Gym Check-in")
 col1, col2 = st.columns(2)
 
 with col1:
-    if st.button('🏁 出勤 (入館)', use_container_width=True):
+    if st.button('出筋', use_container_width=True):
         now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         new_data = pd.DataFrame([[now, '入館']], columns=['日時', '区分'])
         new_data.to_csv(DB_FILE, mode='a', header=not os.path.exists(DB_FILE), index=False)
         st.success(f"入館記録完了！\n{now}")
 
 with col2:
-    if st.button('🏠 退勤 (退館)', use_container_width=True):
+    if st.button('🏠 退筋', use_container_width=True):
         now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         new_data = pd.DataFrame([[now, '退館']], columns=['日時', '区分'])
         new_data.to_csv(DB_FILE, mode='a', header=not os.path.exists(DB_FILE), index=False)
