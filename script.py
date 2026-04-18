@@ -6,8 +6,10 @@ import os
 # 記録用ファイルの準備
 log_file = 'gym_log.csv'
 
+# --- タイトル表示 ---
+st.markdown('<h1 class="main-title">ジム打刻アプリ</h1>', unsafe_allow_html=True)
+
 # --- 【限界突破】巨大ボタンを密着させて表示するHTML ---
-# 幅185px × 2 = 370px（一般的なスマホの横幅ギリギリ）
 st.markdown("""
     <div style="display: flex; justify-content: flex-start; align-items: flex-start;">
         <div style="background-color: #007bff; width: 185px; height: 180px; line-height: 180px; border-radius: 30px; text-align: center; margin-right: 4px;">
@@ -19,7 +21,7 @@ st.markdown("""
     </div>
     """, unsafe_allow_html=True)
 
-# --- 透明な判定用ボタン（サイズを最大化） ---
+# --- 透明な判定用ボタン ---
 col1, col2, _ = st.columns([1, 1, 0.1], gap="small")
 
 with col1:
@@ -45,10 +47,19 @@ with col2:
 # --- レイアウト強制調整CSS ---
 st.markdown("""
     <style>
-    /* 1. 透明ボタンを最大化した色の塊の上に重ねる */
+    /* 1. タイトルのデザインと余白調整 */
+    .main-title {
+        font-size: 28px !important;
+        font-weight: bold !important;
+        margin-bottom: 10px !important;
+        padding-bottom: 0px !important;
+        color: #31333F;
+    }
+
+    /* 2. 透明ボタンを色の塊の上に重ねる */
     .stButton button {
         position: relative;
-        top: -190px; /* 高さ180pxに合わせて位置を調整 */
+        top: -190px;
         height: 180px !important;
         background-color: transparent !important;
         border: none !important;
@@ -56,23 +67,23 @@ st.markdown("""
         z-index: 10;
     }
 
-    /* 2. カラム幅を185pxのボタンにフィットさせる */
+    /* 3. カラム幅の維持 */
     [data-testid="stHorizontalBlock"] {
         gap: 0px !important;
     }
     [data-testid="column"] {
-        flex: 0 0 188px !important; /* ボタン185px + 遊び3px */
+        flex: 0 0 188px !important;
         min-width: 188px !important;
     }
 
-    /* 3. 履歴の位置を調整（ボタンが縦に伸びた分、さらに持ち上げる） */
-    div[data-testid="stVerticalBlock"] > div:nth-child(3) {
+    /* 4. 履歴の位置を調整 */
+    div[data-testid="stVerticalBlock"] > div:nth-child(4) {
         margin-top: -180px !important;
     }
 
-    /* スマホ画面の端まで使えるように余白を最小化 */
+    /* 全体の余白 */
     .main .block-container {
-        padding-top: 1rem !important;
+        padding-top: 1.5rem !important;
         padding-left: 0.5rem !important;
         padding-right: 0.5rem !important;
     }
