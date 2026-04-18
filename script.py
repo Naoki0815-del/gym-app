@@ -6,17 +6,26 @@ import os
 # 記録用ファイルの準備
 log_file = 'gym_log.csv'
 
-# タイトル
+# --- タイトル表示 ---
 st.markdown('<h1 class="main-title">ジム打刻アプリ</h1>', unsafe_allow_html=True)
 
-# --- ボタンエリア ---
-# カラムの幅をボタンサイズ（140px）に完全に固定
-col1, col2, _ = st.columns([140, 140, 50]) 
+# --- 【限界突破】巨大ボタンを密着させて表示するHTML ---
+st.markdown("""
+    <div style="display: flex; justify-content: flex-start; align-items: flex-start;">
+        <div style="background-color: #007bff; width: 185px; height: 180px; line-height: 180px; border-radius: 30px; text-align: center; margin-right: 4px;">
+            <span style="color: white; font-size: 45px; font-weight: bold; font-family: sans-serif;">出筋</span>
+        </div>
+        <div style="background-color: #ff8c00; width: 185px; height: 180px; line-height: 180px; border-radius: 30px; text-align: center;">
+            <span style="color: white; font-size: 45px; font-weight: bold; font-family: sans-serif;">退筋</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# --- 透明な判定用ボタン ---
+col1, col2, _ = st.columns([1, 1, 0.1], gap="small")
 
 with col1:
-    st.markdown('<div class="btn-box blue">出筋</div>', unsafe_allow_html=True)
-    # 透明な判定ボタン
-    if st.button("IN", key="btn_in_ultra", use_container_width=True):
+    if st.button("PUSH IN", key="in_btn", use_container_width=True):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         new_data = pd.DataFrame([[now, "出筋"]], columns=["日時", "種別"])
         if os.path.exists(log_file):
@@ -26,9 +35,7 @@ with col1:
         st.toast("ジムに来れてすごい！", icon="🔥")
 
 with col2:
-    st.markdown('<div class="btn-box orange">退筋</div>', unsafe_allow_html=True)
-    # 透明な判定ボタン
-    if st.button("OUT", key="btn_out_ultra", use_container_width=True):
+    if st.button("PUSH OUT", key="out_btn", use_container_width=True):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         new_data = pd.DataFrame([[now, "退筋"]], columns=["日時", "種別"])
         if os.path.exists(log_file):
@@ -37,68 +44,48 @@ with col2:
             new_data.to_csv(log_file, index=False)
         st.toast("おつかれさま！", icon="✨")
 
-# --- CSS: 隙間ゼロ・密着特化設定 ---
+# --- レイアウト強制調整CSS ---
 st.markdown("""
     <style>
-    /* 1. タイトル */
-    .main-title { font-size: 24px !important; margin-bottom: 5px !important; }
-
-    /* 2. カラム同士の隙間を完全にゼロにする */
-    [data-testid="stHorizontalBlock"] {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        gap: 0px !important; /* 完全密着 */
-        justify-content: flex-start !important;
-    }
-    
-    /* 3. 各カラムの幅とパディングを徹底排除 */
-    [data-testid="column"] {
-        flex: 0 0 140px !important;
-        min-width: 140px !important;
-        max-width: 140px !important;
-        padding-left: 0px !important;
-        padding-right: 0px !important; /* 余計な隙間をカット */
+    /* 1. タイトルのデザインと余白調整 */
+    .main-title {
+        font-size: 28px !important;
+        font-weight: bold !important;
+        margin-bottom: 10px !important;
+        padding-bottom: 0px !important;
+        color: #31333F;
     }
 
-    /* 4. 見た目のボタン（土台） */
-    .btn-box {
-        width: 140px;
-        height: 140px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 32px;
-        font-weight: bold;
-        position: absolute;
-        z-index: 1;
-        pointer-events: none;
-    }
-    .blue { background-color: #007bff; }
-    .orange { background-color: #ff8c00; }
-
-    /* 5. 透明ボタン（判定役） */
+    /* 2. 透明ボタンを色の塊の上に重ねる */
     .stButton button {
-        width: 140px !important;
-        height: 140px !important;
+        position: relative;
+        top: -190px;
+        height: 180px !important;
         background-color: transparent !important;
         border: none !important;
         color: transparent !important;
-        position: relative;
-        z-index: 2;
-        margin: 0 !important;
-        padding: 0 !important;
+        z-index: 10;
     }
 
-    /* 6. 履歴の位置 */
-    div[data-testid="stVerticalBlock"] > div:nth-child(4) {
-        margin-top: 15px !important;
+    /* 3. カラム幅の維持 */
+    [data-testid="stHorizontalBlock"] {
+        gap: 0px !important;
     }
-    
+    [data-testid="column"] {
+        flex: 0 0 188px !important;
+        min-width: 188px !important;
+    }
+
+    /* 4. 履歴の位置を調整 */
+    div[data-testid="stVerticalBlock"] > div:nth-child(4) {
+        margin-top: -180px !important;
+    }
+
+    /* 全体の余白 */
     .main .block-container {
-        padding: 1rem 0.5rem !important;
+        padding-top: 1.5rem !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
     }
     </style>
     """, unsafe_allow_html=True)
