@@ -9,19 +9,26 @@ log_file = 'gym_log.csv'
 # タイトル
 st.markdown('<h1 class="main-title">ジム打刻アプリ</h1>', unsafe_allow_html=True)
 
-# --- 左右のカラムを定義 ---
-# ボタン同士を密着させるため gap="none" に近い設定をCSSで行います
-col1, col2, _ = st.columns([1, 1, 0.1])
-
-with col1:
-    # 見た目のボタン（出筋）
-    st.markdown("""
-        <div class="btn-box blue">
-            <span>出筋</span>
+# --- ボタンエリア ---
+# st.columnsを使わず、一つの箱の中に2つのボタンを配置することで折り返しを絶対阻止します
+st.markdown("""
+    <div class="button-container">
+        <div class="btn-wrapper">
+            <div class="btn-box blue"><span>出筋</span></div>
+            <div id="btn-in"></div>
         </div>
-        """, unsafe_allow_html=True)
-    # 本物のボタン
-    if st.button("IN", key="in_final", use_container_width=True):
+        <div class="btn-wrapper">
+            <div class="btn-box orange"><span>退筋</span></div>
+            <div id="btn-out"></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# 透明ボタンの設置（ここも横並びを強制）
+col_btn1, col_btn2, _ = st.columns([1, 1, 0.01], gap="small")
+
+with col_btn1:
+    if st.button("IN", key="in_final_v3", use_container_width=True):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         new_data = pd.DataFrame([[now, "出筋"]], columns=["日時", "種別"])
         if os.path.exists(log_file):
@@ -30,15 +37,8 @@ with col1:
             new_data.to_csv(log_file, index=False)
         st.toast("ジムに来れてすごい！", icon="🔥")
 
-with col2:
-    # 見た目のボタン（退筋）
-    st.markdown("""
-        <div class="btn-box orange">
-            <span>退筋</span>
-        </div>
-        """, unsafe_allow_html=True)
-    # 本物のボタン
-    if st.button("OUT", key="out_final", use_container_width=True):
+with col_btn2:
+    if st.button("OUT", key="out_final_v3", use_container_width=True):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         new_data = pd.DataFrame([[now, "退筋"]], columns=["日時", "種別"])
         if os.path.exists(log_file):
@@ -47,53 +47,69 @@ with col2:
             new_data.to_csv(log_file, index=False)
         st.toast("おつかれさま！", icon="✨")
 
-# --- レイアウトをミリ単位で整えるCSS ---
+# --- レイアウト強制固定CSS ---
 st.markdown("""
     <style>
-    /* 1. タイトル周りの調整 */
-    .main-title { font-size: 28px !important; margin-bottom: 5px !important; }
+    /* 1. タイトル */
+    .main-title { font-size: 24px !important; margin-bottom: 0px !important; }
 
-    /* 2. 見た目ボタンの共通設定 */
+    /* 2. ボタンコンテナ：絶対に横並び、はみ出しは縮小 */
+    .button-container {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        justify-content: flex-start;
+        width: 100%;
+        margin-bottom: 0px;
+    }
+    .btn-wrapper {
+        position: relative;
+        flex: 0 0 48%; /* 画面幅の約半分に固定 */
+        max-width: 180px;
+        height: 160px;
+        margin-right: 4px;
+    }
+
+    /* 3. 見た目のデザイン */
     .btn-box {
-        width: 175px;
-        height: 180px;
-        line-height: 180px;
-        border-radius: 30px;
-        text-align: center;
-        position: absolute; /* カラム内で浮かせない */
+        width: 100%;
+        height: 100%;
+        border-radius: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     .blue { background-color: #007bff; }
     .orange { background-color: #ff8c00; }
-    .btn-box span { color: white; font-size: 45px; font-weight: bold; font-family: sans-serif; }
+    .btn-box span { color: white; font-size: 38px; font-weight: bold; }
 
-    /* 3. 透明ボタンをそれぞれの「btn-box」の上にピッタリ重ねる */
-    .stButton button {
+    /* 4. 透明ボタンの重ね合わせ（ここが重要） */
+    [data-testid="stHorizontalBlock"] {
         position: relative;
-        width: 175px !important;
-        height: 180px !important;
+        top: -160px; /* ボタンの高さ分だけ上に持ち上げる */
+        margin-bottom: -160px; /* 後続要素への影響を消す */
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        gap: 4px !important;
+    }
+    
+    .stButton button {
+        height: 160px !important;
         background-color: transparent !important;
         border: none !important;
         color: transparent !important;
-        z-index: 100;
-        margin: 0 !important;
+        z-index: 10;
     }
 
-    /* 4. カラム同士を密着させる（隙間ゼロ） */
-    [data-testid="stHorizontalBlock"] { gap: 0px !important; }
-    [data-testid="column"] {
-        flex: 0 0 175px !important;
-        min-width: 175px !important;
-        padding-right: 2px !important; /* わずかなボタン間の隙間 */
-    }
-
-    /* 5. 履歴（最近の記録）の位置調整 */
+    /* 5. 履歴の位置 */
     div[data-testid="stVerticalBlock"] > div:nth-child(4) {
-        margin-top: 10px !important; /* ボタンが絶対配置に近いので、ここは敢えて少し空ける */
+        margin-top: 10px !important;
     }
 
-    /* 6. 全体の余白カット */
+    /* 全体の余白 */
     .main .block-container {
-        padding-top: 1.5rem !important;
+        padding-top: 1rem !important;
         padding-left: 0.5rem !important;
         padding-right: 0.5rem !important;
     }
