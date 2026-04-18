@@ -3,30 +3,76 @@ import pandas as pd
 from datetime import datetime
 import os
 
-# データの保存先設定
-DB_FILE = 'gym_log.csv'
+# --- 強制的・絶対的に色を固定する魔法のコード (CSS) ---
+st.markdown("""
+    <style>
+    /* ボタン全体の枠組みを強制固定 */
+    div.stButton > button {
+        height: 180px !important;
+        border-radius: 25px !important;
+        border: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* ボタンの中の文字を、どんな状態でも「白・極大」に固定 */
+    div.stButton > button div, 
+    div.stButton > button p,
+    div.stButton > button span {
+        font-size: 60px !important;
+        font-weight: bold !important;
+        color: #FFFFFF !important; /* 絶対に白 */
+        opacity: 1 !important;     /* 透明度をゼロに */
+    }
+    
+    /* 出筋（左）：絶対に青 */
+    div[data-testid="column"]:nth-of-type(1) button {
+        background-color: #007bff !important;
+    }
+    
+    /* 退筋（右）：絶対にオレンジ */
+    div[data-testid="column"]:nth-of-type(2) button {
+        background-color: #ff8c00 !important;
+    }
 
-st.title("💪 Gym Check-in")
+    /* カーソルを合わせても、クリックしても色を変えない設定 */
+    div.stButton > button:hover, 
+    div.stButton > button:active, 
+    div.stButton > button:focus {
+        color: #FFFFFF !important;
+        border: none !important;
+        outline: none !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+# ------------------------------------------
 
-# ボタンを横並びにする
+log_file = 'gym_log.csv'
+
 col1, col2 = st.columns(2)
 
 with col1:
-    if st.button('出筋', use_container_width=True):
-        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        new_data = pd.DataFrame([[now, '入館']], columns=['日時', '区分'])
-        new_data.to_csv(DB_FILE, mode='a', header=not os.path.exists(DB_FILE), index=False)
-        st.success(f"入館記録完了！\n{now}")
+    if st.button("出筋", use_container_width=True):
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        new_data = pd.DataFrame([[now, "出筋"]], columns=["日時", "種別"])
+        if os.path.exists(log_file):
+            new_data.to_csv(log_file, mode='a', header=False, index=False)
+        else:
+            new_data.to_csv(log_file, index=False)
+        st.toast("ジムに来れてすごい！", icon="🔥")
 
 with col2:
-    if st.button('🏠 退筋', use_container_width=True):
-        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        new_data = pd.DataFrame([[now, '退館']], columns=['日時', '区分'])
-        new_data.to_csv(DB_FILE, mode='a', header=not os.path.exists(DB_FILE), index=False)
-        st.info(f"退館記録完了！\n{now}")
+    if st.button("退筋", use_container_width=True):
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        new_data = pd.DataFrame([[now, "退筋"]], columns=["日時", "種別"])
+        if os.path.exists(log_file):
+            new_data.to_csv(log_file, mode='a', header=False, index=False)
+        else:
+            new_data.to_csv(log_file, index=False)
+        st.toast("おつかれさま！", icon="✨")
 
-# 履歴の表示
-st.subheader("📊 最近の記録")
-if os.path.exists(DB_FILE):
-    df = pd.read_csv(DB_FILE)
-    st.dataframe(df.tail(10), use_container_width=True)
+if os.path.exists(log_file):
+    st.write("### 最近の記録")
+    df = pd.read_csv(log_file)
+    st.table(df.tail(5))
