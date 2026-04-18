@@ -6,21 +6,21 @@ import os
 # 記録用ファイルの準備
 log_file = 'gym_log.csv'
 
-# --- 2つのボタンを密着させて表示するHTML ---
-# ボタン同士の隙間は「margin: 0 5px 0 0」の部分で調整しています
+# --- 巨大化したボタンを密着させて表示するHTML ---
+# 幅(width)を170px、高さ(height)を150pxに拡大
 st.markdown("""
     <div style="display: flex; justify-content: flex-start; align-items: flex-start;">
-        <div style="background-color: #007bff; width: 140px; height: 120px; line-height: 120px; border-radius: 20px; text-align: center; margin-right: 5px;">
-            <span style="color: white; font-size: 30px; font-weight: bold; font-family: sans-serif;">出筋</span>
+        <div style="background-color: #007bff; width: 170px; height: 150px; line-height: 150px; border-radius: 25px; text-align: center; margin-right: 5px;">
+            <span style="color: white; font-size: 40px; font-weight: bold; font-family: sans-serif;">出筋</span>
         </div>
-        <div style="background-color: #ff8c00; width: 140px; height: 120px; line-height: 120px; border-radius: 20px; text-align: center;">
-            <span style="color: white; font-size: 30px; font-weight: bold; font-family: sans-serif;">退筋</span>
+        <div style="background-color: #ff8c00; width: 170px; height: 150px; line-height: 150px; border-radius: 25px; text-align: center;">
+            <span style="color: white; font-size: 40px; font-weight: bold; font-family: sans-serif;">退筋</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
-# --- 透明な本物のボタンを上に並べる ---
-col1, col2, _ = st.columns([1, 1, 2], gap="small")
+# --- 透明な判定用ボタン（サイズを上に合わせる） ---
+col1, col2, _ = st.columns([1, 1, 1], gap="small")
 
 with col1:
     if st.button("PUSH IN", key="in_btn", use_container_width=True):
@@ -42,33 +42,32 @@ with col2:
             new_data.to_csv(log_file, index=False)
         st.toast("おつかれさま！", icon="✨")
 
-# --- レイアウトの強制調整CSS ---
+# --- レイアウト強制調整CSS ---
 st.markdown("""
     <style>
-    /* 1. 透明ボタンをHTMLで作った色の塊の上にピッタリ重ねる */
+    /* 1. 透明ボタンを巨大化した色の塊の上にピッタリ重ねる */
     .stButton button {
         position: relative;
-        top: -130px; /* ボタンの高さ分だけ上に持ち上げる */
-        height: 120px !important;
+        top: -160px; /* 高さ150pxに合わせて調整 */
+        height: 150px !important;
         background-color: transparent !important;
         border: none !important;
         color: transparent !important;
         z-index: 10;
     }
 
-    /* 2. 透明ボタン同士も隙間を詰める */
+    /* 2. 透明ボタンのカラム幅も拡大したサイズに合わせる */
     [data-testid="stHorizontalBlock"] {
         gap: 0px !important;
-        margin-left: 0px !important;
     }
     [data-testid="column"] {
-        flex: 0 0 145px !important;
-        min-width: 145px !important;
+        flex: 0 0 175px !important;
+        min-width: 175px !important;
     }
 
-    /* 3. 履歴の位置を調整 */
+    /* 3. 履歴の位置を調整（ボタンが大きくなった分、さらに持ち上げる） */
     div[data-testid="stVerticalBlock"] > div:nth-child(3) {
-        margin-top: -120px !important;
+        margin-top: -150px !important;
     }
 
     .main .block-container {
