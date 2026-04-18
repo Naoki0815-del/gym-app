@@ -6,34 +6,24 @@ import os
 # 記録用ファイルの準備
 log_file = 'gym_log.csv'
 
-# --- コンパクトな自作ボタンを生成する関数 ---
-def big_button(label, color, key):
-    button_html = f"""
-        <div style="
-            background-color: {color};
-            height: 120px;
-            line-height: 120px;
-            border-radius: 20px;
-            text-align: center;
-            margin: 5px 0;
-            width: 140px; /* ボタンの横幅 */
-        ">
-            <span style="
-                color: white;
-                font-size: 30px;
-                font-weight: bold;
-                font-family: sans-serif;
-            ">{label}</span>
+# --- 2つのボタンを密着させて表示するHTML ---
+# ボタン同士の隙間は「margin: 0 5px 0 0」の部分で調整しています
+st.markdown("""
+    <div style="display: flex; justify-content: flex-start; align-items: flex-start;">
+        <div style="background-color: #007bff; width: 140px; height: 120px; line-height: 120px; border-radius: 20px; text-align: center; margin-right: 5px;">
+            <span style="color: white; font-size: 30px; font-weight: bold; font-family: sans-serif;">出筋</span>
         </div>
-    """
-    st.markdown(button_html, unsafe_allow_html=True)
-    return st.button(f"PUSH {label}", key=key)
+        <div style="background-color: #ff8c00; width: 140px; height: 120px; line-height: 120px; border-radius: 20px; text-align: center;">
+            <span style="color: white; font-size: 30px; font-weight: bold; font-family: sans-serif;">退筋</span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-# カラムの隙間をゼロ(small)に設定
+# --- 透明な本物のボタンを上に並べる ---
 col1, col2, _ = st.columns([1, 1, 2], gap="small")
 
 with col1:
-    if big_button("出筋", "#007bff", "in_btn"):
+    if st.button("PUSH IN", key="in_btn", use_container_width=True):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         new_data = pd.DataFrame([[now, "出筋"]], columns=["日時", "種別"])
         if os.path.exists(log_file):
@@ -43,7 +33,7 @@ with col1:
         st.toast("ジムに来れてすごい！", icon="🔥")
 
 with col2:
-    if big_button("退筋", "#ff8c00", "out_btn"):
+    if st.button("PUSH OUT", key="out_btn", use_container_width=True):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         new_data = pd.DataFrame([[now, "退筋"]], columns=["日時", "種別"])
         if os.path.exists(log_file):
@@ -52,44 +42,38 @@ with col2:
             new_data.to_csv(log_file, index=False)
         st.toast("おつかれさま！", icon="✨")
 
-# --- ボタン同士の距離を限界まで詰めるCSS ---
+# --- レイアウトの強制調整CSS ---
 st.markdown("""
     <style>
-    /* 1. スマホでも横並びを維持し、隙間をなくす */
-    [data-testid="stHorizontalBlock"] {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        justify-content: flex-start !important;
-        gap: 0px !important; /* カラム間の隙間をゼロに */
-    }
-    
-    /* 2. カラムの幅をさらに絞って密着させる */
-    [data-testid="column"] {
-        width: 145px !important; /* ボタン幅140pxに余白5pxだけ持たせる */
-        flex: 0 0 145px !important;
-        min-width: 145px !important;
-    }
-
-    /* 3. 透明ボタンの設定 */
+    /* 1. 透明ボタンをHTMLで作った色の塊の上にピッタリ重ねる */
     .stButton button {
         position: relative;
-        top: -130px;
-        width: 140px !important;
+        top: -130px; /* ボタンの高さ分だけ上に持ち上げる */
         height: 120px !important;
         background-color: transparent !important;
         border: none !important;
         color: transparent !important;
+        z-index: 10;
     }
 
-    /* 4. 履歴の位置を調整 */
+    /* 2. 透明ボタン同士も隙間を詰める */
+    [data-testid="stHorizontalBlock"] {
+        gap: 0px !important;
+        margin-left: 0px !important;
+    }
+    [data-testid="column"] {
+        flex: 0 0 145px !important;
+        min-width: 145px !important;
+    }
+
+    /* 3. 履歴の位置を調整 */
     div[data-testid="stVerticalBlock"] > div:nth-child(3) {
         margin-top: -120px !important;
     }
-    
+
     .main .block-container {
         padding-top: 1.5rem !important;
-        padding-left: 1rem !important; /* 左端に少しだけ余白 */
+        padding-left: 1rem !important;
     }
     </style>
     """, unsafe_allow_html=True)
