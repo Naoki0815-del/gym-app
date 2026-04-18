@@ -11,15 +11,15 @@ def big_button(label, color, key):
     button_html = f"""
         <div style="
             background-color: {color};
-            height: 200px;
-            line-height: 200px;
+            height: 180px;
+            line-height: 180px;
             border-radius: 25px;
             text-align: center;
-            margin: 10px 0;
+            margin: 5px 0;
         ">
             <span style="
                 color: white;
-                font-size: 60px;
+                font-size: 45px;
                 font-weight: bold;
                 font-family: sans-serif;
             ">{label}</span>
@@ -28,8 +28,9 @@ def big_button(label, color, key):
     st.markdown(button_html, unsafe_allow_html=True)
     return st.button(f"PUSH {label}", key=key, use_container_width=True)
 
-# 左右のカラム作成
-col1, col2 = st.columns(2)
+# --- 左右のカラム作成 ---
+# gapを最小にして、スマホでも横に並びやすくします
+col1, col2 = st.columns(2, gap="small")
 
 with col1:
     if big_button("出筋", "#007bff", "in_btn"):
@@ -51,33 +52,38 @@ with col2:
             new_data.to_csv(log_file, index=False)
         st.toast("おつかれさま！", icon="✨")
 
-# --- 重なりを解消し、位置を整えるCSS ---
+# --- スマホでも横並びを維持するCSS ---
 st.markdown("""
     <style>
-    /* 1. 透明ボタンの設定 */
+    /* 1. カラムの親要素を「折り返し禁止」にする */
+    [data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: flex-start !important;
+    }
+    
+    /* 2. 各カラムが50%ずつ幅をとるように固定 */
+    [data-testid="column"] {
+        width: 50% !important;
+        flex: 1 1 50% !important;
+        min-width: 50% !important;
+    }
+
+    /* 3. 透明ボタンの設定 */
     .stButton button {
         position: relative;
-        top: -220px;
-        height: 200px !important;
+        top: -200px; /* ボタンの高さに合わせて少し調整 */
+        height: 180px !important;
         background-color: transparent !important;
         border: none !important;
         color: transparent !important;
     }
 
-    /* 2. 「最近の記録」見出しだけを上に持ち上げる */
+    /* 4. 見出しの位置調整 */
     div[data-testid="stVerticalBlock"] > div:nth-child(3) {
-        margin-top: -210px !important; /* ボタンとの距離感 */
-        margin-bottom: 10px !important; /* 下のテーブルとの隙間を確保 */
-    }
-
-    /* 3. テーブル（4番目の要素）は持ち上げすぎない */
-    div[data-testid="stVerticalBlock"] > div:nth-child(4) {
-        margin-top: 0px !important;
-    }
-    
-    /* 見出し自体の余白をリセット */
-    h3 {
-        padding-bottom: 5px !important;
+        margin-top: -190px !important;
+        margin-bottom: 10px !important;
     }
     </style>
     """, unsafe_allow_html=True)
