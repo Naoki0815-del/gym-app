@@ -16,7 +16,7 @@ def big_button(label, color, key):
             border-radius: 20px;
             text-align: center;
             margin: 5px 0;
-            width: 140px; /* ボタンの横幅を固定してコンパクトに */
+            width: 140px; /* ボタンの横幅 */
         ">
             <span style="
                 color: white;
@@ -29,9 +29,8 @@ def big_button(label, color, key):
     st.markdown(button_html, unsafe_allow_html=True)
     return st.button(f"PUSH {label}", key=key)
 
-# カラムを作成（左側に寄せるため、右側に大きな空きスペースを作る）
-# [2, 2, 5] の比率で、左側2つにボタンを配置します
-col1, col2, _ = st.columns([1, 1, 2])
+# カラムの隙間をゼロ(small)に設定
+col1, col2, _ = st.columns([1, 1, 2], gap="small")
 
 with col1:
     if big_button("出筋", "#007bff", "in_btn"):
@@ -53,25 +52,26 @@ with col2:
             new_data.to_csv(log_file, index=False)
         st.toast("おつかれさま！", icon="✨")
 
-# --- 左寄せとレイアウトの微調整 ---
+# --- ボタン同士の距離を限界まで詰めるCSS ---
 st.markdown("""
     <style>
-    /* 1. スマホでも横並びを維持し、左に寄せる */
+    /* 1. スマホでも横並びを維持し、隙間をなくす */
     [data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         justify-content: flex-start !important;
+        gap: 0px !important; /* カラム間の隙間をゼロに */
     }
     
-    /* 各カラムの幅をボタンに合わせて固定 */
+    /* 2. カラムの幅をさらに絞って密着させる */
     [data-testid="column"] {
-        width: 150px !important;
-        flex: 0 0 150px !important;
-        min-width: 150px !important;
+        width: 145px !important; /* ボタン幅140pxに余白5pxだけ持たせる */
+        flex: 0 0 145px !important;
+        min-width: 145px !important;
     }
 
-    /* 2. 透明ボタンの設定（幅140px、高さ120pxに合わせる） */
+    /* 3. 透明ボタンの設定 */
     .stButton button {
         position: relative;
         top: -130px;
@@ -82,16 +82,14 @@ st.markdown("""
         color: transparent !important;
     }
 
-    /* 3. 履歴の位置を調整 */
+    /* 4. 履歴の位置を調整 */
     div[data-testid="stVerticalBlock"] > div:nth-child(3) {
         margin-top: -120px !important;
     }
     
-    /* 4. 全体的な余白調整 */
     .main .block-container {
         padding-top: 1.5rem !important;
-        margin-left: 0 !important;
-        text-align: left !important;
+        padding-left: 1rem !important; /* 左端に少しだけ余白 */
     }
     </style>
     """, unsafe_allow_html=True)
