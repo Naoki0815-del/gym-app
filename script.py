@@ -10,14 +10,13 @@ log_file = 'gym_log.csv'
 st.markdown('<h1 class="main-title">ジム打刻アプリ</h1>', unsafe_allow_html=True)
 
 # --- ボタンエリア ---
-# カラムの幅をボタンサイズ（140px）にピッタリ合わせます
+# カラムの幅をボタンサイズ（140px）に完全に固定
 col1, col2, _ = st.columns([140, 140, 50]) 
 
 with col1:
-    # 見た目のボタン
     st.markdown('<div class="btn-box blue">出筋</div>', unsafe_allow_html=True)
     # 透明な判定ボタン
-    if st.button("IN", key="btn_in_final_fixed", use_container_width=True):
+    if st.button("IN", key="btn_in_ultra", use_container_width=True):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         new_data = pd.DataFrame([[now, "出筋"]], columns=["日時", "種別"])
         if os.path.exists(log_file):
@@ -28,7 +27,8 @@ with col1:
 
 with col2:
     st.markdown('<div class="btn-box orange">退筋</div>', unsafe_allow_html=True)
-    if st.button("OUT", key="btn_out_final_fixed", use_container_width=True):
+    # 透明な判定ボタン
+    if st.button("OUT", key="btn_out_ultra", use_container_width=True):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         new_data = pd.DataFrame([[now, "退筋"]], columns=["日時", "種別"])
         if os.path.exists(log_file):
@@ -37,26 +37,28 @@ with col2:
             new_data.to_csv(log_file, index=False)
         st.toast("おつかれさま！", icon="✨")
 
-# --- CSS: 限界まで密着させる設定 ---
+# --- CSS: 隙間ゼロ・密着特化設定 ---
 st.markdown("""
     <style>
     /* 1. タイトル */
     .main-title { font-size: 24px !important; margin-bottom: 5px !important; }
 
-    /* 2. カラム同士の隙間を1pxまで縮小 */
+    /* 2. カラム同士の隙間を完全にゼロにする */
     [data-testid="stHorizontalBlock"] {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
-        gap: 1px !important; /* 5pxから1pxに短縮 */
+        gap: 0px !important; /* 完全密着 */
         justify-content: flex-start !important;
     }
     
-    /* 3. 各カラムの幅を固定 */
+    /* 3. 各カラムの幅とパディングを徹底排除 */
     [data-testid="column"] {
         flex: 0 0 140px !important;
         min-width: 140px !important;
         max-width: 140px !important;
+        padding-left: 0px !important;
+        padding-right: 0px !important; /* 余計な隙間をカット */
     }
 
     /* 4. 見た目のボタン（土台） */
