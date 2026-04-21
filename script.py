@@ -9,7 +9,7 @@ log_file = 'gym_log.csv'
 # --- タイトル表示 ---
 st.markdown('<h1 class="main-title">ジム打刻アプリ</h1>', unsafe_allow_html=True)
 
-# --- 【限界突破】巨大ボタンを密着させて表示するHTML ---
+# --- 巨大ボタンの見た目 ---
 st.markdown("""
     <div style="display: flex; justify-content: flex-start; align-items: flex-start;">
         <div style="background-color: #007bff; width: 185px; height: 180px; line-height: 180px; border-radius: 30px; text-align: center; margin-right: 4px;">
@@ -32,7 +32,6 @@ with col1:
             new_data.to_csv(log_file, mode='a', header=False, index=False)
         else:
             new_data.to_csv(log_file, index=False)
-        st.toast("ジムに来れてすごい！", icon="🔥")
 
 with col2:
     if st.button("PUSH OUT", key="out_btn", use_container_width=True):
@@ -42,51 +41,16 @@ with col2:
             new_data.to_csv(log_file, mode='a', header=False, index=False)
         else:
             new_data.to_csv(log_file, index=False)
-        st.toast("おつかれさま！", icon="✨")
 
-# --- レイアウト強制調整CSS ---
+# --- レイアウト強制調整CSS（中略） ---
 st.markdown("""
     <style>
-    /* 1. タイトルのデザインと余白調整 */
-    .main-title {
-        font-size: 28px !important;
-        font-weight: bold !important;
-        margin-bottom: 10px !important;
-        padding-bottom: 0px !important;
-        color: #31333F;
-    }
-
-    /* 2. 透明ボタンを色の塊の上に重ねる */
-    .stButton button {
-        position: relative;
-        top: -190px;
-        height: 180px !important;
-        background-color: transparent !important;
-        border: none !important;
-        color: transparent !important;
-        z-index: 10;
-    }
-
-    /* 3. カラム幅の維持 */
-    [data-testid="stHorizontalBlock"] {
-        gap: 0px !important;
-    }
-    [data-testid="column"] {
-        flex: 0 0 188px !important;
-        min-width: 188px !important;
-    }
-
-    /* 4. 履歴の位置を調整 */
-    div[data-testid="stVerticalBlock"] > div:nth-child(4) {
-        margin-top: -180px !important;
-    }
-
-    /* 全体の余白 */
-    .main .block-container {
-        padding-top: 1.5rem !important;
-        padding-left: 0.5rem !important;
-        padding-right: 0.5rem !important;
-    }
+    .main-title { font-size: 28px !important; font-weight: bold !important; margin-bottom: 10px !important; color: #31333F; }
+    .stButton button { position: relative; top: -190px; height: 180px !important; background-color: transparent !important; border: none !important; color: transparent !important; z-index: 10; }
+    [data-testid="stHorizontalBlock"] { gap: 0px !important; }
+    [data-testid="column"] { flex: 0 0 188px !important; min-width: 188px !important; }
+    div[data-testid="stVerticalBlock"] > div:nth-child(4) { margin-top: -180px !important; }
+    .main .block-container { padding-top: 1.5rem !important; padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
     </style>
     """, unsafe_allow_html=True)
 
