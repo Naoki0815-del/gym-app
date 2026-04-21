@@ -32,7 +32,7 @@ with col1:
             new_data.to_csv(log_file, mode='a', header=False, index=False)
         else:
             new_data.to_csv(log_file, index=False)
-        st.toast("ジムに来れてすごい！", icon="🔥")
+        st.toast("えらい！", icon="🔥")
 
 with col2:
     if st.button("PUSH OUT", key="out_btn", use_container_width=True):
@@ -42,7 +42,7 @@ with col2:
             new_data.to_csv(log_file, mode='a', header=False, index=False)
         else:
             new_data.to_csv(log_file, index=False)
-        st.toast("おつかれさま！", icon="✨")
+        st.toast("えらい！", icon="✨")
 
 # --- レイアウト強制調整CSS ---
 st.markdown("""
