@@ -1,97 +1,79 @@
-import streamlit as st
+import flet as ft
 import pandas as pd
 from datetime import datetime
 import os
 
-# 記録用ファイルの準備
-log_file = 'gym_log.csv'
+# 保存用ファイル名
+LOG_FILE = "gym_log.csv"
 
-# --- タイトル表示 ---
-st.markdown('<h1 class="main-title">ジム打刻アプリ</h1>', unsafe_allow_html=True)
+def main(page: ft.Page):
+    # --- ページ設定 ---
+    page.title = "ジム打刻アプリ (Flet版)"
+    page.theme_mode = ft.ThemeMode.LIGHT
+    page.window_width = 450
+    page.window_height = 600
+    page.padding = 30
+    page.vertical_alignment = ft.MainAxisAlignment.START
+    page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
 
-# --- 【限界突破】巨大ボタンを密着させて表示するHTML ---
-st.markdown("""
-    <div style="display: flex; justify-content: flex-start; align-items: flex-start;">
-        <div style="background-color: #007bff; width: 185px; height: 180px; line-height: 180px; border-radius: 30px; text-align: center; margin-right: 4px;">
-            <span style="color: white; font-size: 45px; font-weight: bold; font-family: sans-serif;">出筋</span>
-        </div>
-        <div style="background-color: #ff8c00; width: 185px; height: 180px; line-height: 180px; border-radius: 30px; text-align: center;">
-            <span style="color: white; font-size: 45px; font-weight: bold; font-family: sans-serif;">退筋</span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-# --- 透明な判定用ボタン ---
-col1, col2, _ = st.columns([1, 1, 0.1], gap="small")
-
-with col1:
-    if st.button("PUSH IN", key="in_btn", use_container_width=True):
+    # --- 保存・通知処理 ---
+    def record_data(label, color):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        new_data = pd.DataFrame([[now, "出筋"]], columns=["日時", "種別"])
-        if os.path.exists(log_file):
-            new_data.to_csv(log_file, mode='a', header=False, index=False)
+        
+        # CSVへの保存処理
+        new_data = pd.DataFrame([[now, label]], columns=["日時", "種別"])
+        if os.path.exists(LOG_FILE):
+            new_data.to_csv(LOG_FILE, mode='a', header=False, index=False)
         else:
-            new_data.to_csv(log_file, index=False)
-        st.toast("ジムに来れてすごい！", icon="🔥")
+            new_data.to_csv(LOG_FILE, index=False)
 
-with col2:
-    if st.button("PUSH OUT", key="out_btn", use_container_width=True):
-        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        new_data = pd.DataFrame([[now, "退筋"]], columns=["日時", "種別"])
-        if os.path.exists(log_file):
-            new_data.to_csv(log_file, mode='a', header=False, index=False)
-        else:
-            new_data.to_csv(log_file, index=False)
-        st.toast("おつかれさま！", icon="✨")
+        # ポップアップ通知 (SnackBar)
+        msg = "ジムに来れてすごい！🔥" if label == "出筋" else "お疲れさま！✨"
+        page.snack_bar = ft.SnackBar(
+            content=ft.Text(f"{label}完了: {msg}"),
+            bgcolor=color,
+            duration=2000,
+        )
+        page.snack_bar.open = True
+        page.update()
 
-# --- レイアウト強制調整CSS ---
-st.markdown("""
-    <style>
-    /* 1. タイトルのデザインと余白調整 */
-    .main-title {
-        font-size: 28px !important;
-        font-weight: bold !important;
-        margin-bottom: 10px !important;
-        padding-bottom: 0px !important;
-        color: #31333F;
-    }
+    # --- UI要素 ---
+    title = ft.Text("ジム打刻アプリ", size=32, weight="bold", color=ft.colors.BLUE_GREY_900)
 
-    /* 2. 透明ボタンを色の塊の上に重ねる */
-    .stButton button {
-        position: relative;
-        top: -190px;
-        height: 180px !important;
-        background-color: transparent !important;
-        border: none !important;
-        color: transparent !important;
-        z-index: 10;
-    }
+    # 出筋ボタン
+    btn_in = ft.Container(
+        content=ft.Text("出筋", size=40, weight="bold", color="white"),
+        width=180,
+        height=180,
+        bgcolor=ft.colors.BLUE,
+        border_radius=30,
+        alignment=ft.alignment.center,
+        on_click=lambda _: record_data("出筋", ft.colors.BLUE),
+    )
 
-    /* 3. カラム幅の維持 */
-    [data-testid="stHorizontalBlock"] {
-        gap: 0px !important;
-    }
-    [data-testid="column"] {
-        flex: 0 0 188px !important;
-        min-width: 188px !important;
-    }
+    # 退筋ボタン
+    btn_out = ft.Container(
+        content=ft.Text("退筋", size=40, weight="bold", color="white"),
+        width=180,
+        height=180,
+        bgcolor=ft.colors.ORANGE,
+        border_radius=30,
+        alignment=ft.alignment.center,
+        on_click=lambda _: record_data("退筋", ft.colors.ORANGE),
+    )
 
-    /* 4. 履歴の位置を調整 */
-    div[data-testid="stVerticalBlock"] > div:nth-child(4) {
-        margin-top: -180px !important;
-    }
+    # レイアウト配置
+    page.add(
+        title,
+        ft.Divider(height=40, color="transparent"),
+        ft.Row(
+            [btn_in, btn_out],
+            alignment=ft.MainAxisAlignment.CENTER,
+            spacing=20,
+        ),
+        ft.Divider(height=40, color="transparent"),
+        ft.Text("ボタンを押すと自動で gym_log.csv に保存されます", color="grey")
+    )
 
-    /* 全体の余白 */
-    .main .block-container {
-        padding-top: 1.5rem !important;
-        padding-left: 0.5rem !important;
-        padding-right: 0.5rem !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-# 履歴表示
-if os.path.exists(log_file):
-    st.write("### 最近の記録")
-    df = pd.read_csv(log_file)
-    st.table(df.tail(3).iloc[::-1])
+# アプリ起動
+ft.app(target=main)
