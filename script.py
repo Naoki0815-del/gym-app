@@ -18,7 +18,7 @@ def main(page: ft.Page):
     def record(label, message, color):
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
-        # CSV保存 (ファイルがなければ新規、あれば追記)
+        # CSV保存
         df = pd.DataFrame([[now, label]], columns=["日時", "種別"])
         df.to_csv(LOG_FILE, mode='a', header=not os.path.exists(LOG_FILE), index=False)
 
@@ -30,12 +30,12 @@ def main(page: ft.Page):
         page.snack_bar.open = True
         page.update()
 
-    # --- ボタンごとの関数を個別に定義（これで判定を確定させる） ---
+    # --- ボタンごとの処理 ---
     def handle_in(e):
-        record("出筋", "ジムに来れてすごい！🔥", ft.colors.BLUE)
+        record("出筋", "ジムに来れてすごい！🔥", ft.Colors.BLUE) # colors -> Colors
 
     def handle_out(e):
-        record("退筋", "お疲れさま！✨", ft.colors.ORANGE)
+        record("退筋", "お疲れさま！✨", ft.Colors.ORANGE) # colors -> Colors
 
     # --- UI構成 ---
     page.add(
@@ -43,23 +43,23 @@ def main(page: ft.Page):
         ft.Divider(height=40, color="transparent"),
         ft.Row(
             [
-                # 出筋ボタン（左）
+                # 出筋ボタン
                 ft.Container(
                     content=ft.Text("出筋", size=40, weight="bold", color="white"),
                     width=170, height=170,
-                    bgcolor=ft.colors.BLUE,
+                    bgcolor=ft.Colors.BLUE, # colors -> Colors
                     border_radius=30,
                     alignment=ft.alignment.center,
-                    on_click=handle_in, # 専用の関数を呼ぶ
+                    on_click=handle_in,
                 ),
-                # 退筋ボタン（右）
+                # 退筋ボタン
                 ft.Container(
                     content=ft.Text("退筋", size=40, weight="bold", color="white"),
                     width=170, height=170,
-                    bgcolor=ft.colors.ORANGE,
+                    bgcolor=ft.Colors.ORANGE, # colors -> Colors
                     border_radius=30,
                     alignment=ft.alignment.center,
-                    on_click=handle_out, # 専用の関数を呼ぶ
+                    on_click=handle_out,
                 ),
             ],
             alignment=ft.MainAxisAlignment.CENTER,
@@ -67,4 +67,5 @@ def main(page: ft.Page):
         ),
     )
 
-ft.app(target=main)
+# WEBブラウザモードで起動
+ft.app(target=main, view=ft.AppView.WEB_BROWSER)
